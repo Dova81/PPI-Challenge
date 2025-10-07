@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 type Props = {
   onClick: () => void;
   title?: string;
 };
 
-export default function SwitchButton({ onClick, title = "Swap" }: Props) {
+export default function SwitchButton({ onClick, title = 'Swap' }: Props) {
   return (
     <div className="flex items-center mt-5 justify-start sm:justify-center">
       <button

@@ -5,7 +5,7 @@ export type RatesResponse = {
 };
 
 // Now calling local API routes under /api so the client does not call external API directly.
-export async function fetchRates(base = "EUR"): Promise<RatesResponse> {
+export async function fetchRates(base = 'EUR'): Promise<RatesResponse> {
   const url = `/api/rates?base=${encodeURIComponent(base)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch rates: ${res.status}`);
