@@ -9,13 +9,11 @@ export default function useCurrencyData(base = "EUR") {
   const currenciesQuery = useQuery<CurrencyInfo[], Error>({
     queryKey: ["currencies"],
     queryFn: fetchCurrencies,
-    staleTime: 1000 * 60 * 60, // 1 hour
   });
 
   const ratesQuery = useQuery<RatesResponse, Error>({
     queryKey: ["rates", base],
     queryFn: () => fetchRates(base),
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const loading = currenciesQuery.isLoading || ratesQuery.isLoading;

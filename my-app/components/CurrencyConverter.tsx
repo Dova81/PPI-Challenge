@@ -8,14 +8,16 @@ import CurrencyAmountInput from "./CurrencyAmountInput";
 import { getCurrencySymbol } from "../lib/currency";
 
 export default function CurrencyConverter() {
-  const [amount, setAmount] = useState<number>(100);
+  const [amount, setAmount] = useState<number>(1);
   const [from, setFrom] = useState<string>("EUR");
   const [to, setTo] = useState<string>("USD");
   const { currencies, rates, loading, error } = useCurrencyData(from);
+
   const [localCurrencies] = useState(() => [
     { code: "EUR", label: "Euro", symbol: "€" },
     { code: "USD", label: "Dollar", symbol: "$" },
   ]);
+
   const effectiveCurrencies = currencies.length ? currencies : localCurrencies;
 
   const rate = useMemo(() => {

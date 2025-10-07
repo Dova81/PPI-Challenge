@@ -5,3 +5,4 @@ export function getCurrencySymbol(currencies: CurrencyInfo[] | undefined, code: 
   const found = currencies.find((c) => c.code === code);
   return found?.symbol ?? fallback;
 }
+
