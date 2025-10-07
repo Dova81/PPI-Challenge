@@ -1,44 +1,22 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { fetchRates, fetchCurrencies, RatesResponse } from "../lib/exchange";
+import React, { useMemo, useState } from "react";
+import useCurrencyData from "./useCurrencyData";
 import CurrencySelect from "./CurrencySelect";
 import SwitchButton from "./SwitchButton";
 import CurrencyAmountInput from "./CurrencyAmountInput";
+import { getCurrencySymbol } from "../lib/currency";
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState<number>(100);
   const [from, setFrom] = useState<string>("EUR");
   const [to, setTo] = useState<string>("USD");
-  const [rates, setRates] = useState<RatesResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currencies, setCurrencies] = useState<Array<{ code: string; label: string; symbol?: string }>>([
+  const { currencies, rates, loading, error } = useCurrencyData(from);
+  const [localCurrencies] = useState(() => [
     { code: "EUR", label: "Euro", symbol: "€" },
     { code: "USD", label: "Dollar", symbol: "$" },
   ]);
-
-  // load currencies and initial rates
-  useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-
-    Promise.all([fetchCurrencies(), fetchRates()])
-      .then(([cu, r]) => {
-        if (!mounted) return;
-        if (Array.isArray(cu) && cu.length) setCurrencies(cu);
-        setRates(r);
-      })
-      .catch((e) => {
-        console.error(e);
-        if (mounted) setError("Failed to load data");
-      })
-      .finally(() => mounted && setLoading(false));
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const effectiveCurrencies = currencies.length ? currencies : localCurrencies;
 
   const rate = useMemo(() => {
     if (!rates) return null;
@@ -55,16 +33,26 @@ export default function CurrencyConverter() {
   }, [rates, from, to]);
 
   const converted = rate ? +(amount * rate).toFixed(6) : null;
+  const updatedDisplay = rates
+    ? new Intl.DateTimeFormat(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short",
+      }).format(new Date(rates.date))
+    : null;
   return (
     <div className="px-4 py-10">
       <div className="bg-white rounded-xl shadow-xl p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 items-center">
+  <div className="grid grid-cols-1 sm:grid-cols-[3fr_3fr_1fr_3fr] gap-4 items-center">
           <CurrencyAmountInput
             label="Amount"
             value={amount}
             onChange={(v) => setAmount(v)}
-            symbol={currencies.find((c) => c.code === from)?.symbol ?? from}
-            className="sm:col-span-1"
+            symbol={getCurrencySymbol(currencies, from, from)}
           />
 
           <CurrencySelect
@@ -72,23 +60,23 @@ export default function CurrencyConverter() {
             value={from}
             options={currencies}
             onChange={(v) => setFrom(v)}
-            className="sm:col-span-1"
           />
 
-          <SwitchButton
-            onClick={() => {
-              const f = from;
-              setFrom(to);
-              setTo(f);
-            }}
-          />
+          <div className="flex justify-start sm:justify-center">
+            <SwitchButton
+              onClick={() => {
+                const f = from;
+                setFrom(to);
+                setTo(f);
+              }}
+            />
+          </div>
 
           <CurrencySelect
             label="To"
             value={to}
             options={currencies}
             onChange={(v) => setTo(v)}
-            className="sm:col-span-1"
           />
         </div>
 
@@ -99,11 +87,11 @@ export default function CurrencyConverter() {
 
             {!loading && !error && (
               <>
-                <div className="text-lg sm:text-xl font-extrabold mb-1">
+                <div className="text-lg sm:text-xl font-semibold text-black mb-1">
                   {amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {from} =
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
-                  {currencies.find((c) => c.code === to)?.symbol ?? ''} {converted ?? "—"} {to}
+                <div className="text-2xl sm:text-3xl font-semibold text-black mb-2">
+                  {getCurrencySymbol(effectiveCurrencies, to, '')} {converted ?? "—"} {to}
                 </div>
                 <div className="text-sm text-gray-500">
                   {rates && (
@@ -115,13 +103,17 @@ export default function CurrencyConverter() {
           </div>
 
           <div>
-            <div className="bg-blue-50 text-[#0b2f5a] p-4 rounded-lg shadow-sm">
+            <div className="mt-15 bg-blue-50 text-[#0b2f5a] p-4 rounded-lg shadow-sm">
               We use the mid-market rate for our Converter. This is for informational purposes only. You won’t
               receive this rate when sending money.
             </div>
 
             <div className="text-xs text-gray-500 mt-3">
-              {rates && <span>Last updated: {rates.date}</span>}
+              {rates && (
+                <span>
+                  Last updated: {updatedDisplay} 
+                </span>
+              )}
             </div>
           </div>
         </div>
