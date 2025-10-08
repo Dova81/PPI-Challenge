@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import useCurrencyData from './useCurrencyData';
-import CurrencySelect from './CurrencySelect';
-import SwitchButton from './SwitchButton';
-import CurrencyAmountInput from './CurrencyAmountInput';
-import { getCurrencySymbol } from '../lib/currency';
+import useCurrencyData from '../../hooks/useCurrencyData';
+import CurrencySelect from './components/CurrencySelect';
+import SwitchButton from './components/SwitchButton';
+import CurrencyAmountInput from './components/CurrencyAmountInput';
+import { getCurrencySymbol } from '../../lib/currency';
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState<number>(1);
@@ -13,28 +13,22 @@ export default function CurrencyConverter() {
   const [to, setTo] = useState<string>('USD');
   const { currencies, rates, loading, error } = useCurrencyData(from);
 
-  const [localCurrencies] = useState(() => [
-    { code: 'EUR', label: 'Euro', symbol: '€' },
-    { code: 'USD', label: 'Dollar', symbol: '$' },
-  ]);
-
-  const effectiveCurrencies = currencies.length ? currencies : localCurrencies;
 
   const rate = useMemo(() => {
     if (!rates) return null;
     const base = rates.base;
-    // rates.rates is mapping from code -> value relative to base
     if (from === base) {
       return rates.rates[to];
     }
     if (to === base) {
       return 1 / rates.rates[from];
     }
-    // convert from->base->to
+
     return (1 / rates.rates[from]) * rates.rates[to];
   }, [rates, from, to]);
 
-  const converted = rate ? +(amount * rate).toFixed(6) : null;
+  const converted = rate ? (amount * rate).toFixed(2) : null;
+  
   const updatedDisplay = rates
     ? new Intl.DateTimeFormat(undefined, {
         weekday: 'long',
@@ -54,7 +48,6 @@ export default function CurrencyConverter() {
             label="Amount"
             value={amount}
             onChange={(v) => setAmount(v)}
-            symbol={getCurrencySymbol(currencies, from, from)}
           />
 
           <CurrencySelect
@@ -88,7 +81,7 @@ export default function CurrencyConverter() {
                   {amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {from} =
                 </div>
                 <div className="text-2xl sm:text-3xl font-semibold text-black mb-2">
-                  {getCurrencySymbol(effectiveCurrencies, to, '')} {converted ?? '—'} {to}
+                  {getCurrencySymbol(currencies, to, '')} {converted} {to}
                 </div>
                 <div className="text-sm text-gray-500">
                   {rates && (

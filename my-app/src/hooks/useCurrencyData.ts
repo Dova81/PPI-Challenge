@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchCurrencies, fetchRates, RatesResponse, type CurrencyInfo } from '../lib/exchange';
+import { fetchCurrencies, fetchRates, RatesResponse, type CurrencyInfo } from '../services/exchange';
 
 export default function useCurrencyData(base = 'EUR') {
   const queryClient = useQueryClient();
@@ -28,6 +28,7 @@ export default function useCurrencyData(base = 'EUR') {
     queryClient.setQueryData(['rates', bb], data);
     return data;
   };
+
 
   return {
     currencies: currenciesQuery.data || [],

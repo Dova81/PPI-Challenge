@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { controlBase, inputBase, controlPadding, focusRing } from '../lib/styles';
+import { controlBase, inputBase, controlPadding, focusRing } from '../../../lib/styles';
 
-type Option = { code: string; label: string; symbol?: string };
+type Option = { name: string; symbol?: string };
 
 type Props = {
   label?: string;
@@ -24,8 +24,8 @@ export default function CurrencySelect({ label, value: _value, options, onChange
           onChange={(e) => onChange(e.target.value)}
         >
           {options.map((o) => (
-            <option key={o.code} value={o.code}>
-              {o.label}
+            <option key={o.name} value={o.symbol}>
+              {o.name}
             </option>
           ))}
         </select>

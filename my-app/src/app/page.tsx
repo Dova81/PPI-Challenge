@@ -1,29 +1,19 @@
 'use client';
 
-import CurrencyConverter from '../../src/components/CurrencyConverter';
+import CurrencyConverter from '../components/currencyConverter/CurrencyConverter';
+import Banner from '../components/banner/Banner';
+import Header from '../components/header/Header';
 
 export default function Home() {
-  return (
-    <div className="font-sans">
-      <header className="bg-[#0E1342] text-white py-6 px-6">
-        <h1 className="font-inter font-semibold text-[22px] leading-[20px] tracking-[0]">
-          Currency exchange
-        </h1>
-      </header>
-
-      <div className="relative">
-        <div className="bg-[#1A8DFF] text-white pt-10 py-40 px-6 shadow-md z-10 relative">
-          <p className="text-center text-lg sm:text-2xl">
-            100 EUR to USD - Convert Euros to US Dollars
-          </p>
+    return (
+        <div className="font-sans">
+            <Header />
+            <Banner />
+            <main className="-mt-36 relative z-20">
+                <div className="mx-auto max-w-7xl px-4">
+                    <CurrencyConverter />
+                </div>
+            </main>
         </div>
-
-        <main className="-mt-36 relative z-20">
-          <div className="mx-auto max-w-7xl px-4">
-            <CurrencyConverter />
-          </div>
-        </main>
-      </div>
-    </div>
-  );
+    );
 }

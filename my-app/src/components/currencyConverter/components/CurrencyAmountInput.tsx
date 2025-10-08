@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { sanitizeAmount } from '../lib/number';
+import { sanitizeAmount } from '../../../lib/number';
 
 type Props = {
   label?: string;
@@ -14,14 +14,13 @@ type Props = {
 
 export default function CurrencyAmountInput({
   label,
-  value: _value,
+  value,
   onChange,
-  symbol,
-  min = 0,
+  min = 1,
   className = '',
 }: Props) {
   // use the internal name _value to avoid unused-var ESLint errors
-  const isNegative = _value < 0;
+  const isNegative = value < 0;
 
   const wrapperClass = `flex items-center rounded-md overflow-hidden ${isNegative ? 'border border-red-500' : 'border border-gray-200'}`;
 
@@ -35,10 +34,9 @@ export default function CurrencyAmountInput({
         </label>
       )}
       <div className={wrapperClass}>
-        <div className="px-3 text-gray-700 bg-gray-50">{symbol}</div>
         <input
           className="w-full px-3 py-2 bg-white text-black"
-          value={_value}
+          value={value}
           onChange={(e) => onChange(sanitizeAmount(e.target.value, min))}
           type="number"
           min={min}

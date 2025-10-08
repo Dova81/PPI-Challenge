@@ -1,4 +1,4 @@
-import type { CurrencyInfo } from './exchange';
+import type { CurrencyInfo } from '../services/exchange';
 
 export function getCurrencySymbol(
   currencies: CurrencyInfo[] | undefined,
@@ -6,6 +6,6 @@ export function getCurrencySymbol(
   fallback = ''
 ) {
   if (!currencies) return fallback;
-  const found = currencies.find((c) => c.code === code);
+  const found = currencies.find((c) => c.name === code);
   return found?.symbol ?? fallback;
 }

@@ -4,9 +4,8 @@ export type RatesResponse = {
   rates: Record<string, number>;
 };
 
-// Now calling local API routes under /api so the client does not call external API directly.
 export async function fetchRates(base = 'EUR'): Promise<RatesResponse> {
-  const url = `/api/rates?base=${encodeURIComponent(base)}`;
+  const url = `https://api.vatcomply.com/rates?base=${encodeURIComponent(base)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch rates: ${res.status}`);
   const data = await res.json();
@@ -17,11 +16,11 @@ export async function fetchRates(base = 'EUR'): Promise<RatesResponse> {
   };
 }
 
-export type CurrencyInfo = { code: string; label: string; symbol?: string };
+export type CurrencyInfo = { name: string; symbol?: string };
 
 export async function fetchCurrencies(): Promise<CurrencyInfo[]> {
-  const res = await fetch(`/api/currencies`);
+  const res = await fetch(`https://api.vatcomply.com/currencies`);
   if (!res.ok) throw new Error(`Failed to fetch currencies: ${res.status}`);
   const data = await res.json();
-  return data.currencies || [];
+  return Object.values(data) || [];
 }
