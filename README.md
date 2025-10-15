@@ -13,7 +13,6 @@ Aplicación web para convertir divisas usando el tipo de cambio mid‑market del
 1) Instalar dependencias
 
 ```powershell
-cd my-app
 npm install
 ```
 
@@ -56,19 +55,23 @@ Por defecto se sirve en http://localhost:3000.
 ## Estructura del proyecto
 
 ```
-my-app/
-	src/
-		app/                 # Rutas App Router y API Routes
-			api/
-				currencies/route.ts  # GET /api/currencies
-				rates/route.ts       # GET /api/rates?base=EUR
-		components/
-			currencyConverter/     # UI del conversor y subcomponentes
-		hooks/
-			useCurrencyData.ts     # Hook con React Query para tasas/monedas
-		lib/                     # Utilidades (formato, estilos, símbolos)
-		services/
-			exchange.ts            # Llamadas a la API pública (cliente)
+src/
+  app/                     # Rutas App Router y API Routes
+    api/
+      currencies/route.ts  # GET /api/currencies
+      rates/route.ts       # GET /api/rates?base=EUR
+  components/
+    currencyConverter/     # UI del conversor y subcomponentes
+  hooks/
+    useCurrencyData.ts     # Hook con React Query para tasas/monedas
+  lib/                     # Utilidades (formato, estilos, símbolos)
+  services/
+    exchange.ts            # Llamadas a la API pública (cliente)
+
+public/                    # Assets estáticos
+next.config.ts             # Configuración de Next.js
+tsconfig.json              # Configuración de TypeScript
+package.json               # Scripts y dependencias
 ```
 
 ## ¿Cómo usar la aplicación?
