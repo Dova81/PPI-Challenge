@@ -6,6 +6,7 @@ import CurrencySelect from './components/CurrencySelect';
 import SwitchButton from './components/SwitchButton';
 import CurrencyAmountInput from './components/CurrencyAmountInput';
 import { getCurrencySymbol } from '../../lib/currency';
+import ConversionInfo from './components/ConversionInfo';
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState<number>(1);
@@ -13,33 +14,46 @@ export default function CurrencyConverter() {
   const [to, setTo] = useState<string>('USD');
   const { currencies, rates, loading, error } = useCurrencyData(from);
 
+  const conversionUrls = useMemo(() => {
+    const currencieFrom = currencies.find((e) => e.symbol === from);
+    const currencieTo = currencies.find((e) => e.symbol === to);
+
+    const fromSym = currencieFrom?.symbol ? currencieFrom.symbol.toLowerCase() : '';
+    const fromName = currencieFrom?.name ? currencieFrom.name.toLowerCase() : '';
+    const toSym = currencieTo?.symbol ? currencieTo.symbol.toLowerCase() : '';
+    const toName = currencieTo?.name ? currencieTo.name.toLowerCase() : '';
+
+    return {
+      to: `https://www.xe.com/currency/${encodeURIComponent(toSym + (toName ? `-${toName}` : ''))}/`,
+      from: `https://www.xe.com/currency/${encodeURIComponent(fromSym + (fromName ? `-${fromName}` : ''))}/`,
+    };
+  }, [from, to, currencies]);
 
   const rate = useMemo(() => {
-    if (!rates) return null;
+    if (!rates || !rates.rates) return null;
     const base = rates.base;
-    if (from === base) {
-      return rates.rates[to];
-    }
-    if (to === base) {
-      return 1 / rates.rates[from];
-    }
+    const fromRate = rates.rates[from];
+    const toRate = rates.rates[to];
 
-    return (1 / rates.rates[from]) * rates.rates[to];
+    if (from === base) return toRate;
+    if (to === base) return 1 / fromRate;
+    return (1 / fromRate) * toRate;
   }, [rates, from, to]);
 
   const converted = rate ? (amount * rate).toFixed(2) : null;
-  
+
   const updatedDisplay = rates
     ? new Intl.DateTimeFormat(undefined, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZoneName: 'short',
-      }).format(new Date(rates.date))
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }).format(new Date(rates.date))
     : null;
+
   return (
     <div className="px-4 py-10">
       <div className="bg-white rounded-xl shadow-xl p-8">
@@ -95,17 +109,20 @@ export default function CurrencyConverter() {
           </div>
 
           <div>
-            <div className="mt-15 bg-blue-50 text-[#0b2f5a] p-4 rounded-lg shadow-sm">
+            <div className="hidden sm:block mt-15 bg-blue-50 text-[#0b2f5a] p-4 rounded-lg shadow-sm">
               We use the mid-market rate for our Converter. This is for informational purposes only.
               You won’t receive this rate when sending money.
             </div>
 
-            <div className="text-xs text-gray-500 mt-3">
-              {rates && <span>Last updated: {updatedDisplay}</span>}
-            </div>
+            {rates && (
+              <ConversionInfo from={from} to={to} urls={conversionUrls} updatedDisplay={updatedDisplay} className="hidden sm:block text-xs text-gray-500 mt-3" />
+            )}
           </div>
         </div>
       </div>
+      {rates && (
+        <ConversionInfo from={from} to={to} urls={conversionUrls} updatedDisplay={updatedDisplay} className="text-xs text-gray-500 mt-3 sm:hidden" />
+      )}
     </div>
   );
 }

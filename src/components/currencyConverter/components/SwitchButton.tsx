@@ -15,7 +15,7 @@ export default function SwitchButton({ onClick, title = 'Swap' }: Props) {
         title={title}
         onClick={onClick}
       >
-        ⇄
+        <img src="/icon-lg.svg" alt="swap" width={18} height={18} />
       </button>
     </div>
   );
